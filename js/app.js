@@ -1,90 +1,176 @@
-var initialCats = [
-	{
-		clickCount: 0,
-		name: 'Tabby',
-		imgSrc: 'img/434164568_fea0ad4013_z.jpg',
-		imgAttribution: 'https://www.flickr.com',
-		nickNames: ["Orange", "Catty", "Poopy"]
-	}, {
-		clickCount: 0,
-		name: 'Meowy',
-		imgSrc: 'img/22252709_010df3379e_z.jpg',
-		imgAttribution: 'https://www.flickr.com',
-		nickNames: ["Grry", "Prancy", "Poopy"]
-	}, {
-		clickCount: 0,
-		name: 'Kitty',
-		imgSrc: 'img/1413379559_412a540d29_z.jpg',
-		imgAttribution: 'https://www.flickr.com',
-		nickNames: ["Loopy", "Woobbly", "Poopy"]
-	}, {
-		clickCount: 0,
-		name: 'Tigery',
-		imgSrc: 'img/4154543904_6e2428c421_z.jpg',
-		imgAttribution: 'https://www.flickr.com',
-		nickNames: ["Meany", "Salty", "Poopy"]
-	}, {
-		clickCount: 0,
-		name: 'Sleepy',
-		imgSrc: 'img/9648464288_2516b35537_z.jpg',
-		imgAttribution: 'https://www.flickr.com',
-		nickNames: ["Zzzzzy", "Lolly", "Poopy"]
-	}]
+/*thank you for taking the time to review this code. This was written with 
+lots of help Udacity forums, courses, and Udacity members as well as stackoverflow
+suggestions*/
+//data object, array containing name, coordinates, and short description
+var locations = [{
+    name: 'Texas State Capitol',
+    lat: 30.2746935,
+    lng: -97.7402858,
+    description: 'The biggest capitol building in the United States'
+}, {
+    name: 'University of Texas Tower',
+    lat: 30.2861019,
+    lng: -97.7394096,
+    description: 'The primary landmark of the University of Texas'
+}, {
+    name: 'Texas State Cemetery',
+    lat: 30.2660563,
+    lng: -97.7260974,
+    description: 'Many notable Texans and Confederates are buried here'
+}, {
+    name: 'Sixth Street Historic District',
+    lat: 30.267026,
+    lng: -97.7393645,
+    description: 'Still a party hotspot'
+}, {
+    name: "Texas Governor's Mansion",
+    lat: 30.272676,
+    lng: -97.7431553,
+    description: 'Located across the street from the Capitol'
+}, {
+    name: 'LBJ Presidential Library',
+    lat: 30.2858235,
+    lng: -97.7290749,
+    description: 'Designed by a famous modernist architect'
+}, {
+    name: 'Congress Avenue Bridge',
+    lat: 30.2616834,
+    lng: -97.7449977,
+    description: 'Largest urban bat colony'
+}];
 
-var Cat = function(data) {
-	this.clickCount = ko.observable(data.clickCount);
-	this.name = ko.observable(data.name);
-	this.imgSrc = ko.observable(data.imgSrc);
-	this.imgAttribution = ko.observable(data.imgAttribution);
-	this.nickNames = ko.observableArray (data.nickNames)
+//initializes the map and defines the gmaps infowindow
+function initMap() {
+     var Map = document.getElementById('map');
+     vm.map = new google.maps.Map(Map, {
+         center: {
+             lat: 30.2727573,
+             lng: -97.7452755
+         },
+         zoom: 14,
+         disableDefaultUI: false,
+         clickableIcons: false,
+     });
+     vm.infowindow = new google.maps.InfoWindow({
+         maxWidth: 200
+     });
+
+     //iterates through the ko.locationList array and creates a new marker
+     vm.locationList().forEach(function(location) {
+         var marker = new google.maps.Marker({
+             position: new google.maps.LatLng(location.lat(), location.lng()),
+             animation: google.maps.Animation.DROP,
+             map: vm.map
+         });
+         location.marker = marker;
+         //attaches a click event listener to the marker, opens the infowindow 
+         //and executes the wiki search
+         google.maps.event.addListener(marker, 'click', function() {
+             WikiApi(location.name());
+             vm.infowindow.setContent("" + location.description());
+             vm.infowindow.open(vm.map, location.marker);
+         });
+
+     });
+ };
+
+ /*Wikipedia search function using the Wikipedia API, which performs 
+ and AJAX request when executed. Gives a timeout Alert if request is not
+ fulfilled 5000ms*/ 
+ //based on the Udacity 'Intro to AJAX' course. 
+ function WikiApi(param) {
+     var locName = param;
+     var reqUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' 
+        + locName + '&limit=1&format=json&callback=wikiCallback';
+     var wikiRequestTimeout = setTimeout(function() {
+         alert("Failed to get Wikipedia information");
+     }, 5000);
+     // AJAX
+     $.ajax({
+         url: reqUrl,
+         dataType: "jsonp",
+         success: function(response) {
+             var wikiList = response[1];
+             for (var i = 0; i < wikiList.length; i++) {
+                 wikiData = wikiList[i];
+                 var url = 'http://en.wikipedia.org/wiki/' + wikiData;
+             }
+             windowContent = '<h4>Wikipedia</h4>' + '<h5><a href="' 
+                + url + '">' + wikiData + '</a></h5>';
+             $(".gm-style-iw").prepend(windowContent);
+             console.log(windowContent);
+         }
+     });
+     clearTimeout(wikiRequestTimeout);
+ };
 
 
-	//this assigns a string that activates when clickCount reaches a certain amount
-	this.levels = ko.computed(function() {
-		if (this.clickCount() < 10) {
-			return "Infant";
-		}
-		 else if (this.clickCount() < 50) {
-			return "Teenager";
-		} else {
-			return "Adult";
-		}
-	}, this);
-};
+ //sets up animation for marker actions. 
+ var toggleBounce = function(marker) {
+     if (marker.getAnimation() !== null) {
+         marker.setAnimation(null);
+     } else {
+         marker.setAnimation(google.maps.Animation.BOUNCE);
+         setTimeout(function() {
+             marker.setAnimation(null);
+         }, 700);
+     }
+ };
 
-var ViewModel = function() {
-	var self = this;
-	//creates an empty array to store cats
-	this.catList = ko.observableArray([]);
-	//for each item in the initialCats array, we push into the Cat class, which we push into the catList
-	initialCats.forEach(function(catItem) {
-		self.catList.push( new Cat(catItem) );
-	});
-	//then we set the curentCat to the first cat in the catList
-	this.currentCat = ko.observable( this.catList()[0] );
-	//cat selector
-	this.catSelector = function (i) {
-		console.log('hi');
-		self.currentCat(self.catList()[i()])
-		/*  or self.currentCat(clickedCat), where clickedCat is the thing you clicked on (ref dcmentns)
-		also needs to be in the outer function(clickedCat) {}. this is the correct code */
-	};
-	//uses var self
-	this.incrementCounter = function () {
-		self.currentCat().clickCount(self.currentCat().clickCount() + 1);
-	};
-	// this.incrementCounter = function () {
-	// 	this.clickCount(this.clickCount() + 1);
-	// }
-	
-	//testing the computed observable concat
-	//uses var self
-	this.nameAndLevels = ko.computed(function() {
-		return self.currentCat().clickCount() + " " + self.currentCat().levels();
-	});
-	// this.nameAndLevels = ko.computed(function() {
-	// 	return this.clickCount() + " " + this.levels();
-	// },this);
-};
 
-ko.applyBindings(new ViewModel());
+
+ var apiError = function() {
+     alert('Unfortunately, Google Maps is currently unavailable.');
+ };
+
+
+ //object to receive user input in search function
+ var userInput = (" ");
+ //sets up KO object
+ var Location = function(data) {
+    this.name = ko.observable(data.name),
+    this.description = ko.observable(data.description),
+    this.lat = ko.observable(data.lat),
+    this.lng = ko.observable(data.lng),
+    this.LatLng = ko.computed(function() {
+        return this.lat() + "," + this.lng();
+    }, this)
+ };
+
+ //sets up KO viewmodel
+ var ViewModel = function() {
+     var self = this;
+     var location = ko.utils.arrayMap(locations, function(location) {
+         return new Location(location);
+     });
+     self.locationList = ko.observableArray(location);
+     self.filter = ko.observable('');
+
+     //binds list item to marker action, also performs wiki search
+     self.select = function(location) {
+             WikiApi(location.name());
+             toggleBounce(location.marker);
+             vm.infowindow.setContent('' + location.description());
+             vm.infowindow.open(vm.map, location.marker);
+         }
+     //KO function used to compute the search and eliminate list items. 
+     //based on KO documentation
+     self.filteredItems = ko.computed(function() {
+         var listFilter = self.filter().toLowerCase();
+         return ko.utils.arrayFilter(self.locationList(), function(item) {
+             if (item.name().toLowerCase().indexOf(listFilter) > -1) {
+                 if (item.marker) item.marker.setVisible(true);
+                 return true;
+             } else {
+                 item.marker.setVisible(false);
+                 vm.infowindow.close(vm.map, location.marker);
+                 return false;
+             }
+         });
+     }, self);
+
+ }; 
+
+ //defines viewmodel and applies binding
+ var vm = new ViewModel();
+ ko.applyBindings(vm);

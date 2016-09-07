@@ -1,117 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Neighborhood Map</title>
-    <style>
-      html,
-      body {
-        font-family: Arial, sans-serif;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-
-      #map {
-        height: 100%;
-      }
-    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Austin Historic Landmarks</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!--   <ul id="cat-list" data-bind="foreach: catList">
-         have to set the binding context to ViewModel. without $parent the binding context is the cat itself
-        <li data-bind="text: name, click: $parent.catSelector($index)"></li>
-    </ul>
-
-    <div id="cat" data-bind="with: currentCat">
-
-        <h2  data-bind="text: name" id="cat-name"></h2>
-        <div data-bind="text: clickCount" id="cat-count"></div>
-        <div data-bind="text: levels">
-        <ul data-bind="foreach: nickNames">
-            <li data-bind="text: $data"></li>
-        </ul>
+    <div class="container-fluid">
+        <div class="row">
+        <div class="col-md-9">
+      <p>Austin Historic Landmarks</p>
+                <div id="map"></div>
+               
+            </div>
+            <div class="col-sm-push-3">
+                <div class="location-search">
+                    <form id="searchbox" name="searchbox">
+                        <input data-bind="textInput: userInput, value: filter, valueUpdate: 'afterkeydown'" id="search" placeholder="Search Location" type="text">
+                    </form>
+                </div>
+                <ul data-bind="foreach: filteredItems">
+                    <li><button class="btn btn-primary btn-sm" data-bind="text: $data.name, click: $parent.select"></button></li>
+                </ul>
+            </div>
         </div>
-        <div data-bind="text: $parent.nameAndLevels"></div>
-        <img data-bind="click: $parent.incrementCounter, attr: {src: imgSrc}" id="cat-img" src="" alt="cute cat">
-
-    </div> -->
-    <div id="map"></div>
-    <script>
-      var map;
-      var markers = [];
-
-      function initMap() {
-        // Constructor creates a new map - only center and zoom are required.
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 30.3080553, lng: -98.0336026},
-          zoom: 13
-        });
-
-    //locations array
-        var locations = [
-          {title: 'Texas Capitol', location: {lat: 30.2746698, lng: -97.7425392}},
-          {title: 'University of Texas Tower', location: {lat: 30.2862222, lng: -97.7415767}},
-          {title: 'Texas State Cemetery', location: {lat: 30.2671076, lng: -97.7287557}},
-          {title: 'Sixth Street Hitoric District', location: {lat: 30.2668732, lng: -97.7407713}},
-          {title: "Governor's Mansion", location: {lat: 30.2727573, lng: -97.7452755}},
-          {title: 'LBJ Presidential Library', location: {lat: 30.2858833, lng: -97.7314259}},
-          {title: 'Congress Avenue Bridge', location: {lat: 30.2621484, lng: -97.7472451}}
-        ];
-
-        var largeInfowindow = new google.maps.InfoWindow();
-        //creates a new lati and longi bound, captures southwest and northeast corners of the viewport
-        var bounds = new google.maps.LatLngBounds();
-
-        // The following group uses the location array to create an array of markers on initialize.
-        for (var i = 0; i < locations.length; i++) {
-          // Get the position from the location array.
-          var position = locations[i].location;
-          var title = locations[i].title;
-          // Create a marker per location, and put into markers array.
-          var marker = new google.maps.Marker({
-            map: map,
-            position: position,
-            title: title,
-            animation: google.maps.Animation.DROP,
-            id: i
-          });
-          // Push the marker to our array of markers.
-          markers.push(marker);
-          // Create an onclick event to open an infowindow at each marker.
-          marker.addListener('click', function() {
-            populateInfoWindow(this, largeInfowindow);
-          });
-          bounds.extend(markers[i].position);
-        }
-        // Extend the boundaries of the map for each marker. tells map to fit itself to those bounds.
-        map.fitBounds(bounds);
-      }
-
-      // This function populates the infowindow when the marker is clicked. We'll only allow
-      // one infowindow which will open at the marker that is clicked, and populate based
-      // on that markers position.
-      function populateInfoWindow(marker, infowindow) {
-        // Check to make sure the infowindow is not already opened on this marker.
-        if (infowindow.marker != marker) {
-          infowindow.marker = marker;
-          infowindow.setContent('<div>' + marker.title + '</div>');
-          infowindow.open(map, marker);
-          // Make sure the marker property is cleared if the infowindow is closed.
-          infowindow.addListener('closeclick',function(){
-            infowindow.setMarker(null);
-          });
-        }
-      }
-    </script>
-
-
-
-
-<!--     <script src="js/lib/knockout-3.4.0.js"></script>
-    <script src="js/app.js"></script> -->
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5lZuDYSL_VDSY4hBL2uWPnz9yg0PKtVI&v=3&callback=initMap">
-    </script>
+    </div>
+    <script src="js/lib/jquery-1.12.3.js"></script>
+    <script src="js/lib/knockout-3.4.0.js"></script>
+    <script src="js/app.js"></script>
+    <!-- async request for google maps API -->
+    <script async onerror="apiError()" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-7MeBLgUfvFyJW4hebJYJuBJFp-cjrgo&callback=initMap"></script>
 </body>
+
 </html>
