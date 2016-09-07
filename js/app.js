@@ -118,7 +118,7 @@ function initMap() {
  };
 
 
-
+//create error message if google maps API fails to load
  var apiError = function() {
      alert('Unfortunately, Google Maps is currently unavailable.');
  };
