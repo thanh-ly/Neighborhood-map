@@ -80,7 +80,7 @@ function initMap() {
  //based on the Udacity 'Intro to AJAX' course. 
  function WikiApi(param) {
      var name = param;
-     var reqUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' 
+     var reqUrl = 'https://en.wikipedia.org/w/api.php?action=opensearch&search=' 
         + name + '&limit=1&format=json&callback=wikiCallback';
      var wikiRequestTimeout = setTimeout(function() {
          alert("Failed to get Wikipedia information");
@@ -93,7 +93,7 @@ function initMap() {
              var wikiList = response[1];
              for (var i = 0; i < wikiList.length; i++) {
                  wikiData = wikiList[i];
-                 var url = 'http://en.wikipedia.org/wiki/' + wikiData;
+                 var url = 'https://en.wikipedia.org/wiki/' + wikiData;
              }
              windowContent = '<h4>Wikipedia</h4>' + '<h5><a href="' 
                 + url + '">' + wikiData + '</a></h5>';
