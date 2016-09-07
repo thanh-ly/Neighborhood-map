@@ -79,9 +79,9 @@ function initMap() {
  fulfilled 5000ms*/ 
  //based on the Udacity 'Intro to AJAX' course. 
  function WikiApi(param) {
-     var locName = param;
+     var name = param;
      var reqUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' 
-        + locName + '&limit=1&format=json&callback=wikiCallback';
+        + name + '&limit=1&format=json&callback=wikiCallback';
      var wikiRequestTimeout = setTimeout(function() {
          alert("Failed to get Wikipedia information");
      }, 5000);
@@ -106,7 +106,7 @@ function initMap() {
 
 
  //sets up animation for marker actions. 
- var toggleBounce = function(marker) {
+ var animation = function(marker) {
      if (marker.getAnimation() !== null) {
          marker.setAnimation(null);
      } else {
@@ -149,7 +149,7 @@ function initMap() {
      //binds list item to marker action, also performs wiki search
      self.select = function(location) {
              WikiApi(location.name());
-             toggleBounce(location.marker);
+             animation(location.marker);
              vm.infowindow.setContent('' + location.description());
              vm.infowindow.open(vm.map, location.marker);
          }
