@@ -73,7 +73,7 @@ function initMap() {
          });
 
      });
- };
+ }
 
  /*Wikipedia search function using the Wikipedia API, which performs 
  and AJAX request when executed. Gives a timeout Alert if request is not
@@ -104,7 +104,7 @@ function initMap() {
          }
      });
      
- };
+ }
 
 
  //sets up animation for marker actions. 
@@ -136,7 +136,7 @@ function initMap() {
     this.lng = ko.observable(data.lng),
     this.LatLng = ko.computed(function() {
         return this.lat() + "," + this.lng();
-    }, this)
+    }, this);
  };
 
  //sets up KO viewmodel
@@ -154,7 +154,7 @@ function initMap() {
              animation(location.marker);
              vm.infowindow.setContent('' + location.description());
              vm.infowindow.open(vm.map, location.marker);
-         }
+         };
      //KO function used to compute the search and eliminate list items. 
      //based on KO documentation
      self.filteredItems = ko.computed(function() {
