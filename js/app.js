@@ -67,6 +67,7 @@ function initMap() {
          //and executes the wiki search
          google.maps.event.addListener(marker, 'click', function() {
              WikiApi(location.name());
+             animation(location.marker);
              vm.infowindow.setContent("" + location.description());
              vm.infowindow.open(vm.map, location.marker);
          });
@@ -99,9 +100,10 @@ function initMap() {
                 + url + '">' + wikiData + '</a></h5>';
              $(".gm-style-iw").prepend(windowContent);
              console.log(windowContent);
+             clearTimeout(wikiRequestTimeout);
          }
      });
-     clearTimeout(wikiRequestTimeout);
+     
  };
 
 
